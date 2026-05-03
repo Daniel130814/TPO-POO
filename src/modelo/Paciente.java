@@ -1,6 +1,7 @@
 package modelo;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Paciente {
     //Forma de los atributos: Encapsulamiento (siempre se usa en private) + Tipo de dato (En mayuscula) + el nombre del atributo (en minuscula y termina con ;)
@@ -18,7 +19,7 @@ public class Paciente {
     // Despues aparecen los metodos, el que usamos es el constructor que es el metodo que permite la creación de los objetos
     // El metodo se llama como la clase misma (en este caso paciente)
     // la clase en java se escribe en singular y con la mayuscula
-    // La clase constructor no tiene salida
+    // El metodo constructor no tiene salida
     public Paciente() {
     }
     public Paciente(Long id, String nombre, String apellido, String dni, String email, LocalDate fechaIngreso, Domicilio domicilio){
@@ -49,6 +50,7 @@ public class Paciente {
     // metodo getter y setter
     // getter viene de get, que es agarrar, y se usa para agarrar algo que ya está cargado para poderlo ver. Por ejemplo un nombre
     // Setter viene de set, poner, y se usa por ejemplo cuando escribo un nombre mal y lo quiero cambiar. En ese caso se usa el setter
+
     // para un getter lo que se necesita es: el encapsulamiento(como es un metodo va en publico), la salida (que espero que me devuelva el metodo),nombre(get+Nombre con la mayuscula del parametro)
     public String getNombre(){
         return this.nombre;
@@ -65,13 +67,14 @@ public class Paciente {
     public String getEmail(){
         return this.email;
     }
-
     public LocalDate getFechaIngreso() {
         return this.fechaIngreso;
     }
     public Domicilio getDomicilio() {
         return domicilio;
     }
+    public String getNombreCompleto(){return nombre+" "+apellido;}
+
 
     //Metodo Setter
 
@@ -115,6 +118,18 @@ public class Paciente {
                 ", fechaIngreso=" + fechaIngreso +
                 ", domicilio=" + domicilio +
                 '}';
+    }
+    // Hashcode y equals
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Paciente paciente = (Paciente) o;
+        return Objects.equals(dni, paciente.dni);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(dni);
     }
 }
 

@@ -10,61 +10,67 @@ public class Turno {
     private LocalTime hora;
     private EstadoTurno estado;
 
-    public Turno(Long id, Paciente paciente, Odontologo odontologo, LocalDate fecha, LocalTime hora, EstadoTurno estado) {
+    // Metodo Constructor
+    public Turno() {
+    }
+
+    public Turno(Long id, Paciente paciente, Odontologo odontologo, LocalDate fecha, LocalTime hora) {
         this.id = id;
         this.paciente = paciente;
         this.odontologo = odontologo;
         this.fecha = fecha;
         this.hora = hora;
-        this.estado = estado;
+        this.estado = EstadoTurno.PENDIENTE;
     }
 
-    public Long getId() {
-        return id;
-    }
 
+    //Metodo Setter
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Paciente getPaciente() {
-        return paciente;
     }
 
     public void setPaciente(Paciente paciente) {
         this.paciente = paciente;
     }
 
-    public Odontologo getOdontologo() {
-        return odontologo;
-    }
-
     public void setOdontologo(Odontologo odontologo) {
         this.odontologo = odontologo;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
     }
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
     }
 
-    public LocalTime getHora() {
-        return hora;
-    }
-
     public void setHora(LocalTime hora) {
         this.hora = hora;
     }
 
-    public EstadoTurno getEstado() {
-        return estado;
-    }
-
     public void setEstado(EstadoTurno estado) {
         this.estado = estado;
+    }
+
+
+    //Metodo Getter
+    public Long getId() {
+        return id;
+    }
+
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public Odontologo getOdontologo() {
+        return odontologo;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public LocalTime getHora() {return hora;}
+
+    public EstadoTurno getEstado() {
+        return estado;
     }
 
     @Override
