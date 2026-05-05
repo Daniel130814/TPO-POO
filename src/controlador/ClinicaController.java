@@ -77,9 +77,35 @@ public class ClinicaController implements Runnable {
         String apellido = vista.pedirDatoString("Apellido");
         String matricula = vista.pedirDatoString("Matrícula");
 
-        OdontologoGeneral odon = new OdontologoGeneral(null, nombre, apellido, matricula, 50000.0, true, 1);
+        vista.mostrarMensaje("\n¿Cuál es su especialidad?");
+        vista.mostrarMensaje("1. Odontólogo General");
+        vista.mostrarMensaje("2. Ortodoncista");
+        vista.mostrarMensaje("3. Endodoncista");
+        int opcionEspecialidad = vista.pedirDatoInt("Ingrese una opción");
 
-        if (servicioOdontologo.registrar(odon) != null) {
+        // Creamos la variable Odontologo (la clase padre) para que pueda guardar cualquiera de los 3 tipos
+        Odontologo nuevoOdon = null;
+
+        switch (opcionEspecialidad) {
+            case 1:
+                nuevoOdon = new OdontologoGeneral(null, nombre, apellido, matricula, 50000.0, true, 1);
+                break;
+            case 2:
+                // Asumo los parámetros base, podés pedirle más datos si tu clase Ortodoncista los necesita
+                nuevoOdon = new Ortodoncista(null, nombre, apellido, matricula, 50000.0, "Brackets");
+                break;
+            case 3:
+                // Asumo los parámetros base, podés pedirle más datos si tu clase Endodoncista los necesita
+                nuevoOdon = new Endodoncista(null, nombre, apellido, matricula, 50000.0, true);
+                break;
+            default:
+                vista.mostrarMensaje("Especialidad no válida. Se cancela el registro.");
+                vista.pausar();
+                return;
+        }
+
+        // Lo registramos en el servicio
+        if (servicioOdontologo.registrar(nuevoOdon) != null) {
             vista.mostrarMensaje("Odontólogo registrado exitosamente.");
         }
         vista.pausar();
