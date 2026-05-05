@@ -41,11 +41,14 @@ public class PacienteController {
         String nombre = vista.pedirDatoString("Nombre");
         String apellido = vista.pedirDatoString("Apellido");
         String dni = vista.pedirDatoString("DNI");
+        String email = vista.pedirDatoString("Email: ");
         String calle = vista.pedirDatoString("Calle");
         int nro = vista.pedirDatoInt("Número");
+        String localidad = vista.pedirDatoString("Localidad: ");
+        String provincia = vista.pedirDatoString("Provincia: ");
 
-        Domicilio dom = new Domicilio(calle, nro, "Aldo Bonzi", "Buenos Aires");
-        Paciente nuevo = new Paciente(null, nombre, apellido, dni, "email@correo.com", LocalDate.now(), dom);
+        Domicilio dom = new Domicilio(calle, nro, localidad, provincia);
+        Paciente nuevo = new Paciente(nombre,apellido,dni,email,dom);
 
         if (servicioPaciente.registrar(nuevo) != null) {
             vista.mostrarMensaje("Paciente registrado exitosamente.");
@@ -93,11 +96,7 @@ public class PacienteController {
         Paciente p = servicioPaciente.buscarPorId(id);
 
         if (p != null) {
-            // Validación de la imagen: No tener turnos futuros
-            boolean tieneTurnos = servicioTurno.listarTodos().stream()
-                    .anyMatch(t -> t.getPaciente().getId().equals(id) && !t.getFecha().isBefore(LocalDate.now()));
-
-            if (tieneTurnos) {
+            if (servicioTurno.tieneTurnosPendientes(id)) {
                 vista.mostrarMensaje("No se puede eliminar: El paciente tiene turnos pendientes.");
             } else {
                 servicioPaciente.eliminarPorId(id);

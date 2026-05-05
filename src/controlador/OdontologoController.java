@@ -1,19 +1,15 @@
 package controlador;
 
-import modelo.Endodoncista;
-import modelo.Odontologo;
-import modelo.OdontologoGeneral;
-import modelo.Ortodoncista;
+import modelo.*;
 import servicio.ServicioOdontologo;
 import servicio.ServicioTurno;
 import vista.VistaClinica;
-import java.time.LocalDate;
 import java.util.List;
 
 public class OdontologoController {
 
     private ServicioOdontologo servicioOdontologo;
-    private ServicioTurno servicioTurno; // Necesario para validar la baja
+    private ServicioTurno servicioTurno;
     private VistaClinica vista;
 
     public OdontologoController(VistaClinica vista, ServicioOdontologo servicioOdontologo, ServicioTurno servicioTurno) {
@@ -61,7 +57,7 @@ public class OdontologoController {
                 nuevo = new Endodoncista(null, nombre, apellido, matricula, sueldoBase, true);
                 break;
             default:
-                vista.mostrarMensaje("Opción no válida.");
+                vista.mostrarMensaje("Opción no valida.");
                 return;
         }
 
@@ -111,13 +107,10 @@ public class OdontologoController {
         Odontologo o = servicioOdontologo.buscarPorId(id);
 
         if (o != null) {
-            // Validación de imagen: Que no tenga turnos futuros
-            boolean tieneTurnos = servicioTurno.listarTodos().stream()
-                    .anyMatch(t -> t.getOdontologo().getId().equals(id) && !t.getFecha().isBefore(LocalDate.now()));
-
-            if (tieneTurnos) {
+            if (servicioTurno.tieneTurnosPendientesOdontologo(id)) {
                 vista.mostrarMensaje("No se puede eliminar: El profesional tiene turnos pendientes.");
             } else {
+                // Si no tiene turnos, procedemos a borrarlo
                 servicioOdontologo.eliminarPorId(id);
                 vista.mostrarMensaje("Odontólogo eliminado correctamente.");
             }

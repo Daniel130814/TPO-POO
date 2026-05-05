@@ -42,45 +42,64 @@ public class TurnoController {
     private void reservarTurno() {
         vista.mostrarMensaje("\n-- Reserva de Turno (Urgencia) --");
 
-        // 1. Identificar Paciente
-        Long idPac = vista.pedirDatoLong("ID del Paciente");
-        Paciente paciente = servicioPaciente.buscarPorId(idPac);
+        // 1. Identificar al Paciente por DNI (Estilo Profe: limpio)
+        String dni = vista.pedirDatoString("Ingrese DNI del paciente");
+        Paciente paciente = servicioPaciente.buscarPorDni(dni);
+
         if (paciente == null) {
-            vista.mostrarMensaje("Error: Paciente no encontrado.");
+            vista.mostrarMensaje("Error: El paciente no existe. Regístrelo primero.");
+            vista.pausar();
             return;
         }
 
-        // 2. Elegir Especialidad y Odontólogo
-        vista.mostrarMensaje("\nEspecialidad requerida: 1. General | 2. Ortodoncia | 3. Endodoncia");
+        // 2. Elegir Odontólogo por Especialidad (Lógica delegada al servicio)
+        vista.mostrarMensaje("\nSeleccione Especialidad: 1. General | 2. Ortodoncia | 3. Endodoncia");
         int esp = vista.pedirDatoInt("Opción");
 
-        filtrarYMostrarOdontologos(esp);
+        List<Odontologo> filtrados = servicioOdontologo.obtenerPorEspecialidad(esp);
 
-        Long idOdon = vista.pedirDatoLong("ID del Odontólogo elegido");
+        if (filtrados.isEmpty()) {
+            vista.mostrarMensaje("No hay profesionales disponibles en esa especialidad.");
+            vista.pausar();
+            return;
+        }
+
+        vista.mostrarMensaje("\nOdontólogos disponibles:");
+        for (Odontologo o : filtrados) {
+            vista.mostrarMensaje("ID: " + o.getId() + " | Dr/a. " + o.getApellido() + " " + o.getNombre());
+        }
+
+        Long idOdon = vista.pedirDatoLong("Ingrese el ID del odontólogo elegido");
         Odontologo odontologo = servicioOdontologo.buscarPorId(idOdon);
 
         if (odontologo == null) {
-            vista.mostrarMensaje("Error: Odontólogo no encontrado.");
+            vista.mostrarMensaje("ID de odontólogo inválido.");
+            vista.pausar();
             return;
         }
 
-        // 3. Fecha y Hora con Validación de Disponibilidad
+        // 3. Fecha y Hora
         String fechaStr = vista.pedirDatoString("Fecha (AAAA-MM-DD)");
         LocalDate fecha = LocalDate.parse(fechaStr);
         String horaStr = vista.pedirDatoString("Hora (HH:MM)");
         LocalTime hora = LocalTime.parse(horaStr);
 
-        if (validarOcupado(idOdon, fecha, hora)) {
+        // 4. VALIDACIÓN DE OCUPADO (Delegada al ServicioTurno con el bucle for)
+        if (servicioTurno.validarOcupado(idOdon, fecha, hora)) {
             vista.mostrarMensaje("Error: El odontólogo ya tiene un turno en ese horario.");
         } else {
+            // 5. Datos específicos de Urgencia y Registro
             String intStr = vista.pedirDatoString("¿Requiere intervención? (si/no)");
             boolean intervencion = intStr.equalsIgnoreCase("si");
 
-            TurnoUrgente nuevo = new TurnoUrgente(null, paciente, odontologo, fecha, hora, EstadoTurno.PENDIENTE, 15000.0, intervencion, 0.0);
+            // Creamos el objeto (el ID es null porque se genera en el Repo/DB)
+            TurnoUrgente nuevo = new TurnoUrgente(null, paciente, odontologo, fecha, hora,
+                    EstadoTurno.PENDIENTE, 15000.0, intervencion, 0.0);
 
             if (servicioTurno.registrar(nuevo) != null) {
-                vista.mostrarMensaje("¡Turno reservado con éxito!");
-                vista.mostrarMensaje("Precio Final: $" + nuevo.calculaPrecioFinal());
+                vista.mostrarMensaje("\n¡Turno reservado con éxito!");
+                vista.mostrarMensaje("Paciente: " + paciente.getNombre() + " " + paciente.getApellido());
+                vista.mostrarMensaje("Monto base a cobrar: $" + nuevo.calculaPrecioFinal());
             }
         }
         vista.pausar();
@@ -123,22 +142,4 @@ public class TurnoController {
         vista.pausar();
     }
 
-    // Métodos auxiliares de lógica
-    private void filtrarYMostrarOdontologos(int opcion) {
-        for (Odontologo o : servicioOdontologo.listarTodos()) {
-            if ((opcion == 1 && o instanceof OdontologoGeneral) ||
-                    (opcion == 2 && o instanceof Ortodoncista) ||
-                    (opcion == 3 && o instanceof Endodoncista)) {
-                vista.mostrarMensaje("ID: " + o.getId() + " | Dr/a. " + o.getApellido());
-            }
-        }
-    }
-
-    private boolean validarOcupado(Long idOdon, LocalDate f, LocalTime h) {
-        return servicioTurno.listarTodos().stream()
-                .anyMatch(t -> t.getOdontologo().getId().equals(idOdon)
-                        && t.getFecha().equals(f)
-                        && t.getHora().equals(h)
-                        && t.getEstado() != EstadoTurno.CANCELADO);
-    }
 }

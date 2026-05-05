@@ -1,9 +1,11 @@
 package servicio;
 
-import modelo.Odontologo;
+import modelo.*;
 import modelo.Odontologo;
 import repositorio.IRepositorio;
 import repositorio.RepositorioOdontologo;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServicioOdontologo implements IService<Odontologo> {
@@ -54,7 +56,23 @@ public class ServicioOdontologo implements IService<Odontologo> {
     }
 
     public Odontologo buscarPorMatricula(String mat) {
-        return listarTodos().stream().filter(o -> o.getMatricula().equals(mat)).findFirst().orElse(null);
+        for (Odontologo o : odontologoIRepositorio.listarTodos()) {
+            if (o.getMatricula().equals(mat)) {
+                return o;
+            }
+        }
+        return null;
     }
 
+    public List<Odontologo> obtenerPorEspecialidad(int opcion) {
+        List<Odontologo> filtrados = new ArrayList<>();
+        for (Odontologo o : odontologoIRepositorio.listarTodos()) {
+            if ((opcion == 1 && o instanceof OdontologoGeneral) ||
+                    (opcion == 2 && o instanceof Ortodoncista) ||
+                    (opcion == 3 && o instanceof Endodoncista)) {
+                filtrados.add(o);
+            }
+        }
+        return filtrados;
+    }
 }

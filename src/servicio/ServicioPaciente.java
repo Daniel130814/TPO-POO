@@ -1,6 +1,7 @@
 package servicio;
 
 import modelo.Paciente;
+import modelo.Turno;
 import repositorio.IRepositorio;
 import repositorio.RepositorioPaciente;
 import java.util.List;
@@ -53,6 +54,7 @@ public class ServicioPaciente implements IService<Paciente> {
         System.out.println("Paciente eliminado exitosamente.");
     }
 
+
     @Override
     public void actualizar(Paciente pacienteModificado) {
         // Directamente delegamos al repositorio
@@ -66,10 +68,13 @@ public class ServicioPaciente implements IService<Paciente> {
     }
 
     public Paciente buscarPorDni(String dni) {
-        return listarTodos().stream()
-                .filter(p -> p.getDni().equals(dni))
-                .findFirst()
-                .orElse(null);
+        for (Paciente p : pacienteRepository.listarTodos()) {
+            if (p.getDni().equals(dni)) {
+                return p;
+            }
+        }
+        return null;
     }
+
 
 }
