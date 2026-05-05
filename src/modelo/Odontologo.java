@@ -2,22 +2,33 @@ package modelo;
 
 import java.util.Objects;
 
-public class Odontologo {
+public abstract class Odontologo {
     private Long id;//tipo long (puede ser un int)
     private String nombre;
     private String apellido;
     private String matricula;
+    private double salarioBase;
+
 
     // Metodo Constructor
     public Odontologo() {
     }
 
-    public Odontologo(Long id, String nombre, String apellido, String matricula) {
+    public Odontologo(Long id, String nombre, String apellido, String matricula, double salarioBase) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.matricula = matricula;
+        this.salarioBase = salarioBase;
     }
+
+    // Metodo que vamos a sobrescribir por polimorfismo
+    public abstract double calcularHonorarios();
+
+    //No todos los especialistas pueden atender urgencias
+    public abstract boolean atiendeUrgencias();
+
+
 
     //Metodo Getter
     public Long getId() {
@@ -38,8 +49,17 @@ public class Odontologo {
 
     public String getNombreCompleto(){return nombre+" "+apellido;}
 
+    public double getSalarioBase() {
+        return salarioBase;
+    }
+
 
     //Metodo Setter
+
+
+    public void setSalarioBase(double salarioBase) {
+        this.salarioBase = salarioBase;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -64,6 +84,7 @@ public class Odontologo {
                 ", nombre='" + nombre + '\'' +
                 ", apellido='" + apellido + '\'' +
                 ", matricula='" + matricula + '\'' +
+                ", salarioBase=" + salarioBase +
                 '}';
     }
 
