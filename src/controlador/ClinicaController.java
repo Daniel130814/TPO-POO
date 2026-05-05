@@ -95,30 +95,72 @@ public class ClinicaController implements Runnable {
 
     private void asignarTurno() {
         vista.mostrarMensaje("\n-- Asignar Turno --");
-        Long idPac = vista.pedirDatoLong("ID del Paciente");
-        Long idOdon = vista.pedirDatoLong("ID del Odontólogo");
 
+        // 1. Pedimos y validamos el Paciente
+        Long idPac = vista.pedirDatoLong("ID del Paciente");
         Paciente pTurno = servicioPaciente.buscarPorId(idPac);
+
+        if (pTurno == null) {
+            vista.mostrarMensaje("Error: No se encontró ningún paciente con ese ID.");
+            vista.pausar();
+            return; // Cortamos la ejecución acá si no existe
+        }
+
+        // 2. Sub-menú de Especialidades
+        vista.mostrarMensaje("\n¿Qué especialista necesita?");
+        vista.mostrarMensaje("1. Odontólogo General");
+        vista.mostrarMensaje("2. Ortodoncista");
+        vista.mostrarMensaje("3. Endodoncista");
+        int tipoEspecialidad = vista.pedirDatoInt("Ingrese una opción");
+
+        // 3. Filtramos y mostramos los Odontólogos de esa especialidad
+        vista.mostrarMensaje("\n--- Odontólogos Disponibles ---");
+        boolean hayDisponibles = false;
+
+        for (Odontologo o : servicioOdontologo.listarTodos()) {
+            boolean coincide = false;
+            // Usamos instanceof para saber de qué tipo es cada odontólogo en la lista
+            if (tipoEspecialidad == 1 && o instanceof OdontologoGeneral) coincide = true;
+            else if (tipoEspecialidad == 2 && o instanceof Ortodoncista) coincide = true;
+            else if (tipoEspecialidad == 3 && o instanceof Endodoncista) coincide = true;
+
+            if (coincide) {
+                vista.mostrarMensaje("ID: " + o.getId() + " | Nombre: " + o.getNombre() + " " + o.getApellido());
+                hayDisponibles = true;
+            }
+        }
+
+        if (!hayDisponibles) {
+            vista.mostrarMensaje("Lo sentimos, no hay odontólogos registrados para esa especialidad en este momento.");
+            vista.pausar();
+            return;
+        }
+
+        // 4. Pedimos el Odontólogo de la lista mostrada
+        Long idOdon = vista.pedirDatoLong("\nIngrese el ID del Odontólogo elegido");
         Odontologo oTurno = servicioOdontologo.buscarPorId(idOdon);
 
-        if (pTurno != null && oTurno != null) {
-
-            // 1. En vez del motivo, le preguntamos tus variables reales:
-            String intervencionStr = vista.pedirDatoString("¿Requiere intervención? (si/no)");
-            boolean requiereIntervencion = intervencionStr.equalsIgnoreCase("si"); // Si escribe "si", es true. Si no, false.
-
-            int duracion = vista.pedirDatoInt("Duración estimada en minutos");
-
-            // 2. Ahora sí, llamamos al constructor EXACTO como lo tenés en la foto (línea 15)
-            // Orden: id, paciente, odontologo, fecha, hora, estado, precioBase, requiereIntervencion, duracion
-            TurnoUrgente turno = new TurnoUrgente(null, pTurno, oTurno, LocalDate.now(), LocalTime.now(), EstadoTurno.PENDIENTE, 15000.0, requiereIntervencion, duracion);
-
-            if (servicioTurno.registrar(turno) != null) {
-                vista.mostrarMensaje("Turno registrado exitosamente.");
-            }
-        } else {
-            vista.mostrarMensaje("Error: Paciente u Odontólogo no encontrado.");
+        if (oTurno == null) {
+            vista.mostrarMensaje("Error: Odontólogo no encontrado.");
+            vista.pausar();
+            return;
         }
+
+        // 5. Finalizamos el turno como lo teníamos armado
+        String intervencionStr = vista.pedirDatoString("\n¿Requiere intervención? (si/no)");
+        boolean requiereIntervencion = intervencionStr.equalsIgnoreCase("si");
+        int duracion = vista.pedirDatoInt("Duración estimada en minutos");
+
+        TurnoUrgente turno = new TurnoUrgente(null, pTurno, oTurno, LocalDate.now(), LocalTime.now(), EstadoTurno.PENDIENTE, 15000.0, requiereIntervencion, duracion);
+
+        if (servicioTurno.registrar(turno) != null) {
+            vista.mostrarMensaje("¡Turno asignado exitosamente al paciente " + pTurno.getNombre() + "!");
+        } else {
+            vista.mostrarMensaje("Hubo un error al registrar el turno.");
+        }
+
+        vista.pausar();
+
     }
 
     private void salir() {
