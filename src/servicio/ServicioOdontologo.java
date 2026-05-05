@@ -52,4 +52,9 @@ public class ServicioOdontologo implements IService<Odontologo> {
     public List<Odontologo> listarTodos() {
         return odontologoIRepositorio.listarTodos();
     }
+
+    public Odontologo buscarPorMatricula(String mat) {
+        return listarTodos().stream().filter(o -> o.getMatricula().equals(mat)).findFirst().orElse(null);
+    }
+
 }

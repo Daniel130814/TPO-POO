@@ -64,4 +64,12 @@ public class ServicioPaciente implements IService<Paciente> {
     public List<Paciente> listarTodos() {
         return pacienteRepository.listarTodos();
     }
+
+    public Paciente buscarPorDni(String dni) {
+        return listarTodos().stream()
+                .filter(p -> p.getDni().equals(dni))
+                .findFirst()
+                .orElse(null);
+    }
+
 }
