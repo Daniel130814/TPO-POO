@@ -1,6 +1,8 @@
 package modelo;
 
-public class OdontologoGeneral extends Odontologo{
+import java.io.Serializable;
+
+public class OdontologoGeneral extends Odontologo {
     private boolean atiendeNinios;
     private int consultorioAsignado;
 

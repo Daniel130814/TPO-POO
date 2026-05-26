@@ -1,5 +1,8 @@
 package servicio;
 
+import Exceptions.DatoInvalidoException;
+import Exceptions.MatriculaDuplicadaException;
+import Exceptions.OdontologoNoEncontrado;
 import modelo.*;
 import modelo.Odontologo;
 import repositorio.IRepositorio;
@@ -17,37 +20,57 @@ public class ServicioOdontologo implements IService<Odontologo> {
     }
 
     @Override
-    public Odontologo registrar(Odontologo odontologo) {
-        if (odontologo.getMatricula()==null|| odontologo.getMatricula().trim().isEmpty()){
-            System.out.println("Error: La matrícula del odontólogo es obligatoria.");
-            return null;
+    public Odontologo registrar(Odontologo odontologo)
+            throws DatoInvalidoException, MatriculaDuplicadaException {
+
+        if (odontologo.getMatricula() == null ||
+                odontologo.getMatricula().trim().isEmpty()) {
+            throw new DatoInvalidoException(
+                    "La matrícula del odontólogo es obligatoria."
+            );
         }
-        List<Odontologo> odontologosExistentes= odontologoIRepositorio.listarTodos();
-        for (Odontologo o : odontologosExistentes){
-            if (o.getMatricula().equals(odontologo.getMatricula())){
-                System.out.println("Error: Ya existe un profesional registrado con la matrícula " + odontologo.getMatricula());
-                return null;
+
+        for (Odontologo o : odontologoIRepositorio.listarTodos()) {
+            if (o.getMatricula().equals(odontologo.getMatricula())) {
+                throw new MatriculaDuplicadaException(
+                        "Ya existe un profesional registrado con matrícula: "
+                                + odontologo.getMatricula()
+                );
             }
         }
-        System.out.println("Éxito: Odontólogo registrado correctamente.");
+
         return odontologoIRepositorio.guardar(odontologo);
     }
 
     @Override
-    public Odontologo buscarPorId(Long id) {
-        return odontologoIRepositorio.buscarPorId(id);
+    public Odontologo buscarPorId(Long id)
+            throws OdontologoNoEncontrado {
+
+        Odontologo odontologo = odontologoIRepositorio.buscarPorId(id);
+
+        if (odontologo == null) {
+            throw new OdontologoNoEncontrado(
+                    "No existe un odontólogo con ID: " + id
+            );
+        }
+
+        return odontologo;
     }
 
     @Override
-    public void eliminarPorId(Long id) {
+    public void eliminarPorId(Long id)
+            throws OdontologoNoEncontrado {
+
+        buscarPorId(id);
         odontologoIRepositorio.eliminarPorId(id);
-        System.out.println("Odontólogo eliminado exitosamente.");
     }
 
     @Override
-    public void actualizar(Odontologo odontologoModificado) {
+    public void actualizar(Odontologo odontologoModificado)
+            throws OdontologoNoEncontrado {
+
+        buscarPorId(odontologoModificado.getId());
         odontologoIRepositorio.actualizar(odontologoModificado);
-        System.out.println("Odontólogo actualizado exitosamente.");
     }
 
     @Override
@@ -55,24 +78,32 @@ public class ServicioOdontologo implements IService<Odontologo> {
         return odontologoIRepositorio.listarTodos();
     }
 
-    public Odontologo buscarPorMatricula(String mat) {
+    public Odontologo buscarPorMatricula(String matricula)
+            throws OdontologoNoEncontrado {
+
         for (Odontologo o : odontologoIRepositorio.listarTodos()) {
-            if (o.getMatricula().equals(mat)) {
+            if (o.getMatricula().equals(matricula)) {
                 return o;
             }
         }
-        return null;
+
+        throw new OdontologoNoEncontrado(
+                "No existe un odontólogo con matrícula: " + matricula
+        );
     }
 
     public List<Odontologo> obtenerPorEspecialidad(int opcion) {
         List<Odontologo> filtrados = new ArrayList<>();
+
         for (Odontologo o : odontologoIRepositorio.listarTodos()) {
             if ((opcion == 1 && o instanceof OdontologoGeneral) ||
                     (opcion == 2 && o instanceof Ortodoncista) ||
                     (opcion == 3 && o instanceof Endodoncista)) {
+
                 filtrados.add(o);
             }
         }
+
         return filtrados;
     }
 }

@@ -3,9 +3,14 @@ package servicio;
 import java.util.List;
 
 public interface IService<T> {
-    T registrar(T t);
-    T buscarPorId(Long id); // Usamos Long como exige la clínica
-    void eliminarPorId(Long id);
-    void actualizar(T t);   // Pasamos el objeto entero para poder modificar sus datos
+
+    T registrar(T entidad) throws Exception;
+
+    T buscarPorId(Long id) throws Exception;
+
+    void eliminarPorId(Long id) throws Exception;
+
+    void actualizar(T entidad) throws Exception;
+
     List<T> listarTodos();
 }

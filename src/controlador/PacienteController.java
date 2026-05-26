@@ -5,7 +5,6 @@ import modelo.Paciente;
 import servicio.ServicioPaciente;
 import servicio.ServicioTurno; // Importante para la validación
 import vista.VistaClinica;
-import java.time.LocalDate;
 import java.util.List;
 
 public class PacienteController {
@@ -37,49 +36,75 @@ public class PacienteController {
     }
 
     private void registrarPaciente() {
-        vista.mostrarMensaje("\n-- Registro de Paciente --");
-        String nombre = vista.pedirDatoString("Nombre");
-        String apellido = vista.pedirDatoString("Apellido");
-        String dni = vista.pedirDatoString("DNI");
-        String email = vista.pedirDatoString("Email: ");
-        String calle = vista.pedirDatoString("Calle");
-        int nro = vista.pedirDatoInt("Número");
-        String localidad = vista.pedirDatoString("Localidad: ");
-        String provincia = vista.pedirDatoString("Provincia: ");
+        try {
+            vista.mostrarMensaje("\n-- Registro de Paciente --");
 
-        Domicilio dom = new Domicilio(calle, nro, localidad, provincia);
-        Paciente nuevo = new Paciente(nombre,apellido,dni,email,dom);
+            String nombre = vista.pedirDatoString("Nombre");
+            String apellido = vista.pedirDatoString("Apellido");
+            String dni = vista.pedirDatoString("DNI");
+            String email = vista.pedirDatoString("Email");
+            String calle = vista.pedirDatoString("Calle");
+            int nro = vista.pedirDatoInt("Número");
+            String localidad = vista.pedirDatoString("Localidad");
+            String provincia = vista.pedirDatoString("Provincia");
 
-        if (servicioPaciente.registrar(nuevo) != null) {
+            Domicilio dom = new Domicilio(calle, nro, localidad, provincia);
+
+            Paciente nuevo = new Paciente(nombre, apellido, dni, email, dom);
+
+            servicioPaciente.registrar(nuevo);
+
             vista.mostrarMensaje("Paciente registrado exitosamente.");
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
+
         vista.pausar();
     }
 
     private void buscarPacientePorId() {
-        Long id = vista.pedirDatoLong("Ingrese ID a buscar");
-        Paciente p = servicioPaciente.buscarPorId(id);
-        if (p != null) {
-            vista.mostrarMensaje("Encontrado: " + p.getNombre() + " " + p.getApellido() + " [DNI: " + p.getDni() + "]");
-        } else {
-            vista.mostrarMensaje("No se encontró paciente con ID: " + id);
+        try {
+            Long id = vista.pedirDatoLong("Ingrese ID a buscar");
+
+            Paciente p = servicioPaciente.buscarPorId(id);
+
+            vista.mostrarMensaje(
+                    "Encontrado: " +
+                            p.getNombre() + " " +
+                            p.getApellido() +
+                            " [DNI: " + p.getDni() + "]"
+            );
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
+
         vista.pausar();
     }
 
     private void buscarPacientePorDni() {
-        String dni = vista.pedirDatoString("Ingrese DNI a buscar");
-        Paciente p = servicioPaciente.buscarPorDni(dni);
-        if (p != null) {
-            vista.mostrarMensaje("Encontrado: " + p.getNombre() + " " + p.getApellido() + " [ID: " + p.getId() + "]");
-        } else {
-            vista.mostrarMensaje("No se encontró paciente con DNI: " + dni);
+        try {
+            String dni = vista.pedirDatoString("Ingrese DNI a buscar");
+
+            Paciente p = servicioPaciente.buscarPorDni(dni);
+
+            vista.mostrarMensaje(
+                    "Encontrado: " +
+                            p.getNombre() + " " +
+                            p.getApellido() +
+                            " [ID: " + p.getId() + "]"
+            );
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
+
         vista.pausar();
     }
 
     private void listarPacientes() {
-        List<Paciente> lista = servicioPaciente.listarTodos();
+        List<Paciente> lista = servicioPaciente.listarOrdenadosPorApellido();
         if (lista.isEmpty()) {
             vista.mostrarMensaje("No hay pacientes registrados.");
         } else {
@@ -91,20 +116,30 @@ public class PacienteController {
         vista.pausar();
     }
 
-    private void eliminarPaciente() {
-        Long id = vista.pedirDatoLong("Ingrese ID del paciente a eliminar");
-        Paciente p = servicioPaciente.buscarPorId(id);
 
-        if (p != null) {
+    private void eliminarPaciente() {
+        try {
+            Long id = vista.pedirDatoLong(
+                    "Ingrese ID del paciente a eliminar"
+            );
+
+            servicioPaciente.buscarPorId(id);
+
             if (servicioTurno.tieneTurnosPendientes(id)) {
-                vista.mostrarMensaje("No se puede eliminar: El paciente tiene turnos pendientes.");
+                vista.mostrarMensaje(
+                        "No se puede eliminar: el paciente tiene turnos pendientes."
+                );
             } else {
                 servicioPaciente.eliminarPorId(id);
-                vista.mostrarMensaje("Paciente eliminado correctamente.");
+                vista.mostrarMensaje(
+                        "Paciente eliminado correctamente."
+                );
             }
-        } else {
-            vista.mostrarMensaje("No existe paciente con ID: " + id);
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
+
         vista.pausar();
     }
 }

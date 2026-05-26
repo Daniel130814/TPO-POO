@@ -1,7 +1,9 @@
 package servicio;
 
+import Exceptions.DatoInvalidoException;
+import Exceptions.DniDuplicadoException;
+import Exceptions.PacienteNoEncontradoException;
 import modelo.Paciente;
-import modelo.Turno;
 import repositorio.IRepositorio;
 import repositorio.RepositorioPaciente;
 import java.util.List;
@@ -16,50 +18,66 @@ public class ServicioPaciente implements IService<Paciente> {
     }
 
     @Override
-    public Paciente registrar(Paciente paciente) {
-        // Validamos que los datos básicos no estén vacíos
+    public Paciente registrar(Paciente paciente)
+            throws DatoInvalidoException, DniDuplicadoException {
+
         if (paciente.getNombre() == null || paciente.getNombre().trim().isEmpty()) {
-            System.out.println("Error: El nombre del paciente es obligatorio.");
-            return null;
+            throw new DatoInvalidoException("El nombre del paciente es obligatorio.");
         }
 
         if (paciente.getDni() == null || paciente.getDni().trim().isEmpty()) {
-            System.out.println("Error: El DNI del paciente es obligatorio.");
-            return null;
+            throw new DatoInvalidoException("El DNI del paciente es obligatorio.");
         }
 
-        // Validación de Negocio (CU1): El DNI no puede estar duplicado
-        List<Paciente> pacientesExistentes = pacienteRepository.listarTodos();
-        for (Paciente p : pacientesExistentes) {
+        for (Paciente p : pacienteRepository.listarTodos()) {
             if (p.getDni().equals(paciente.getDni())) {
-                System.out.println("Error: Ya existe un paciente registrado con el DNI " + paciente.getDni());
-                return null; // Cortamos la ejecución y no guardamos nada
+                throw new DniDuplicadoException(
+                        "Ya existe un paciente registrado con DNI: " + paciente.getDni()
+                );
             }
         }
 
-        // Si pasó todas las validaciones, lo mandamos a guardar
-        System.out.println("Éxito: Paciente registrado correctamente.");
         return pacienteRepository.guardar(paciente);
     }
 
     @Override
-    public Paciente buscarPorId(Long id) {
-        return pacienteRepository.buscarPorId(id);
+    public Paciente buscarPorId(Long id) throws PacienteNoEncontradoException {
+
+        Paciente paciente = pacienteRepository.buscarPorId(id);
+
+        if (paciente == null) {
+            throw new PacienteNoEncontradoException(
+                    "No existe un paciente con ID: " + id
+            );
+        }
+
+        return paciente;
     }
 
     @Override
-    public void eliminarPorId(Long id) {
-        // Validar si el ID existe antes de eliminar
+    public void eliminarPorId(Long id) throws PacienteNoEncontradoException {
+
+        buscarPorId(id); // valida existencia
+
         pacienteRepository.eliminarPorId(id);
-        System.out.println("Paciente eliminado exitosamente.");
     }
 
 
     @Override
-    public void actualizar(Paciente pacienteModificado) {
-        // Directamente delegamos al repositorio
+    public void actualizar(Paciente pacienteModificado)
+            throws PacienteNoEncontradoException {
+
+        buscarPorId(pacienteModificado.getId());
+
         pacienteRepository.actualizar(pacienteModificado);
-        System.out.println("Paciente actualizado exitosamente.");
+    }
+    
+    public List<Paciente> listarOrdenadosPorApellido() {
+        return pacienteRepository.listarTodos()
+                .stream()
+                .sorted((p1, p2) ->
+                        p1.getApellido().compareToIgnoreCase(p2.getApellido()))
+                .toList();
     }
 
     @Override
@@ -67,13 +85,18 @@ public class ServicioPaciente implements IService<Paciente> {
         return pacienteRepository.listarTodos();
     }
 
-    public Paciente buscarPorDni(String dni) {
+    public Paciente buscarPorDni(String dni)
+            throws PacienteNoEncontradoException {
+
         for (Paciente p : pacienteRepository.listarTodos()) {
             if (p.getDni().equals(dni)) {
                 return p;
             }
         }
-        return null;
+
+        throw new PacienteNoEncontradoException(
+                "No existe un paciente registrado con DNI: " + dni
+        );
     }
 
 

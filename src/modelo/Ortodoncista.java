@@ -1,6 +1,8 @@
 package modelo;
 
-public class Ortodoncista extends Odontologo {
+import java.io.Serializable;
+
+public class Ortodoncista extends Odontologo  {
     private String tipoBrackets;
 
     public Ortodoncista(String tipoBrackets) {

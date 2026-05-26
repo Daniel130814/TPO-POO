@@ -35,57 +35,95 @@ public class OdontologoController {
     }
 
     private void registrarOdontologo() {
-        vista.mostrarMensaje("\n-- Registro de Odontólogo --");
-        String nombre = vista.pedirDatoString("Nombre");
-        String apellido = vista.pedirDatoString("Apellido");
-        String matricula = vista.pedirDatoString("Matrícula");
+        try {
+            vista.mostrarMensaje("\n-- Registro de Odontólogo --");
 
-        vista.mostrarMensaje("\nEspecialidad: 1. General | 2. Ortodoncia | 3. Endodoncia");
-        int opcion = vista.pedirDatoInt("Opción");
+            String nombre = vista.pedirDatoString("Nombre");
+            String apellido = vista.pedirDatoString("Apellido");
+            String matricula = vista.pedirDatoString("Matrícula");
 
-        Odontologo nuevo = null;
-        double sueldoBase = 50000.0;
+            vista.mostrarMensaje(
+                    "\nEspecialidad: 1. General | 2. Ortodoncia | 3. Endodoncia"
+            );
 
-        switch (opcion) {
-            case 1:
-                nuevo = new OdontologoGeneral(null, nombre, apellido, matricula, sueldoBase, true, 1);
-                break;
-            case 2:
-                nuevo = new Ortodoncista(null, nombre, apellido, matricula, sueldoBase, "Brackets");
-                break;
-            case 3:
-                nuevo = new Endodoncista(null, nombre, apellido, matricula, sueldoBase, true);
-                break;
-            default:
-                vista.mostrarMensaje("Opción no valida.");
-                return;
+            int opcion = vista.pedirDatoInt("Opción");
+
+            Odontologo nuevo;
+            double sueldoBase = 50000.0;
+
+            switch (opcion) {
+                case 1:
+                    nuevo = new OdontologoGeneral(null, nombre, apellido, matricula, sueldoBase, true, 1);
+                    break;
+
+                case 2:
+                    nuevo = new Ortodoncista(null, nombre, apellido, matricula, sueldoBase, "Brackets");
+                    break;
+
+                case 3:
+                    nuevo = new Endodoncista(null, nombre, apellido, matricula, sueldoBase, true);
+                    break;
+
+                default:
+                    vista.mostrarMensaje("Opción no válida.");
+                    vista.pausar();
+                    return;
+            }
+
+            servicioOdontologo.registrar(nuevo);
+
+            vista.mostrarMensaje(
+                    "Odontólogo registrado exitosamente."
+            );
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
 
-        if (servicioOdontologo.registrar(nuevo) != null) {
-            vista.mostrarMensaje("Odontólogo registrado exitosamente.");
-        }
         vista.pausar();
     }
 
     private void buscarOdontologoPorId() {
-        Long id = vista.pedirDatoLong("Ingrese ID a buscar");
-        Odontologo o = servicioOdontologo.buscarPorId(id);
-        if (o != null) {
-            vista.mostrarMensaje("Encontrado: Dr/a. " + o.getNombre() + " " + o.getApellido() + " [Matrícula: " + o.getMatricula() + "]");
-        } else {
-            vista.mostrarMensaje("No se encontró odontólogo con ID: " + id);
+        try {
+            Long id = vista.pedirDatoLong("Ingrese ID a buscar");
+
+            Odontologo o = servicioOdontologo.buscarPorId(id);
+
+            vista.mostrarMensaje(
+                    "Encontrado: Dr/a. " +
+                            o.getNombre() + " " +
+                            o.getApellido() +
+                            " [Matrícula: " +
+                            o.getMatricula() + "]"
+            );
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
+
         vista.pausar();
     }
 
     private void buscarOdontologoPorMatricula() {
-        String mat = vista.pedirDatoString("Ingrese Matrícula a buscar");
-        Odontologo o = servicioOdontologo.buscarPorMatricula(mat);
-        if (o != null) {
-            vista.mostrarMensaje("Encontrado: Dr/a. " + o.getNombre() + " " + o.getApellido() + " [ID: " + o.getId() + "]");
-        } else {
-            vista.mostrarMensaje("No se encontró odontólogo con Matrícula: " + mat);
+        try {
+            String mat = vista.pedirDatoString(
+                    "Ingrese Matrícula a buscar"
+            );
+
+            Odontologo o =
+                    servicioOdontologo.buscarPorMatricula(mat);
+
+            vista.mostrarMensaje(
+                    "Encontrado: Dr/a. " +
+                            o.getNombre() + " " +
+                            o.getApellido() +
+                            " [ID: " + o.getId() + "]"
+            );
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
+
         vista.pausar();
     }
 
@@ -103,20 +141,29 @@ public class OdontologoController {
     }
 
     private void eliminarOdontologo() {
-        Long id = vista.pedirDatoLong("Ingrese ID del odontólogo a eliminar");
-        Odontologo o = servicioOdontologo.buscarPorId(id);
+        try {
+            Long id = vista.pedirDatoLong(
+                    "Ingrese ID del odontólogo a eliminar"
+            );
 
-        if (o != null) {
+            servicioOdontologo.buscarPorId(id);
+
             if (servicioTurno.tieneTurnosPendientesOdontologo(id)) {
-                vista.mostrarMensaje("No se puede eliminar: El profesional tiene turnos pendientes.");
+                vista.mostrarMensaje(
+                        "No se puede eliminar: el profesional tiene turnos pendientes."
+                );
             } else {
-                // Si no tiene turnos, procedemos a borrarlo
                 servicioOdontologo.eliminarPorId(id);
-                vista.mostrarMensaje("Odontólogo eliminado correctamente.");
+
+                vista.mostrarMensaje(
+                        "Odontólogo eliminado correctamente."
+                );
             }
-        } else {
-            vista.mostrarMensaje("No existe odontólogo con ID: " + id);
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error: " + e.getMessage());
         }
+
         vista.pausar();
     }
 }

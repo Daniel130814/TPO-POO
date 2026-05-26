@@ -1,9 +1,10 @@
 package modelo;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class TurnoUrgente extends Turno{
+public class TurnoUrgente extends Turno  {
     private boolean requiereIntervencion; //requiere una intervención como por ejemplo una extracción?
     private double duracion;
 
