@@ -1,6 +1,5 @@
 package modelo;
 
-import java.io.Serializable;
 
 public class Endodoncista extends Odontologo {
     private boolean usaMicroscopio;

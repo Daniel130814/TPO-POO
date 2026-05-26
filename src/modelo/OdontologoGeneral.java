@@ -1,6 +1,5 @@
 package modelo;
 
-import java.io.Serializable;
 
 public class OdontologoGeneral extends Odontologo {
     private boolean atiendeNinios;

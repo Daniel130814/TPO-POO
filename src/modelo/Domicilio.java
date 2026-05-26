@@ -1,7 +1,5 @@
 package modelo;
 
-import java.io.Serializable;
-
 public class Domicilio {
     private Long id;
     private String calle;

@@ -1,6 +1,5 @@
 package modelo;
 
-import java.io.Serializable;
 
 public class Ortodoncista extends Odontologo  {
     private String tipoBrackets;
