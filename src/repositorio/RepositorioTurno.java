@@ -58,6 +58,6 @@ public class RepositorioTurno implements IRepositorio<Turno> {
 
     @Override
     public List<Turno> listarTodos() {
-        return turnos;
+        return new ArrayList<>(turnos);
     }
 }

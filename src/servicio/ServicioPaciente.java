@@ -6,6 +6,8 @@ import Exceptions.PacienteNoEncontradoException;
 import modelo.Paciente;
 import repositorio.IRepositorio;
 import repositorio.RepositorioPaciente;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServicioPaciente implements IService<Paciente> {
@@ -73,11 +75,21 @@ public class ServicioPaciente implements IService<Paciente> {
     }
     
     public List<Paciente> listarOrdenadosPorApellido() {
-        return pacienteRepository.listarTodos()
-                .stream()
-                .sorted((p1, p2) ->
-                        p1.getApellido().compareToIgnoreCase(p2.getApellido()))
-                .toList();
+        List<Paciente> ordenados = new ArrayList<>(pacienteRepository.listarTodos());
+
+        for (int i = 0; i < ordenados.size() - 1; i++) {
+            for (int j = 0; j < ordenados.size() - 1 - i; j++) {
+                Paciente actual = ordenados.get(j);
+                Paciente siguiente = ordenados.get(j + 1);
+
+                if (actual.getApellido().compareToIgnoreCase(siguiente.getApellido()) > 0) {
+                    ordenados.set(j, siguiente);
+                    ordenados.set(j + 1, actual);
+                }
+            }
+        }
+
+        return ordenados;
     }
 
     @Override

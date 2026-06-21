@@ -1,6 +1,7 @@
 package servicio;
 
 import Exceptions.DatoInvalidoException;
+import Exceptions.TurnoNoEncontradoException;
 import Exceptions.TurnoYaReservadoException;
 import modelo.EstadoTurno;
 import modelo.Turno;
@@ -10,6 +11,7 @@ import repositorio.RepositorioTurno;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServicioTurno implements IService<Turno> {
@@ -57,12 +59,12 @@ public class ServicioTurno implements IService<Turno> {
     }
 
     @Override
-    public Turno buscarPorId(Long id) throws DatoInvalidoException {
+    public Turno buscarPorId(Long id) throws TurnoNoEncontradoException {
 
         Turno turno = turnoRepository.buscarPorId(id);
 
         if (turno == null) {
-            throw new DatoInvalidoException(
+            throw new TurnoNoEncontradoException(
                     "No existe un turno con ID: " + id
             );
         }
@@ -71,14 +73,14 @@ public class ServicioTurno implements IService<Turno> {
     }
 
     @Override
-    public void eliminarPorId(Long id) throws DatoInvalidoException {
+    public void eliminarPorId(Long id) throws TurnoNoEncontradoException {
         buscarPorId(id);
         turnoRepository.eliminarPorId(id);
     }
 
     @Override
     public void actualizar(Turno turnoModificado)
-            throws DatoInvalidoException {
+            throws TurnoNoEncontradoException {
 
         buscarPorId(turnoModificado.getId());
         turnoRepository.actualizar(turnoModificado);
@@ -90,58 +92,109 @@ public class ServicioTurno implements IService<Turno> {
     }
 
     public boolean tieneTurnosPendientes(Long pacienteId) {
-        return turnoRepository.listarTodos()
-                .stream()
-                .anyMatch(t ->
-                        t.getPaciente() != null &&
-                                t.getPaciente().getId().equals(pacienteId) &&
-                                !t.getFecha().isBefore(LocalDate.now()));
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (turno.getPaciente() != null &&
+                    turno.getPaciente().getId().equals(pacienteId) &&
+                    !turno.getFecha().isBefore(LocalDate.now())) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean tieneTurnosPendientesOdontologo(Long odontologoId) {
-        return turnoRepository.listarTodos()
-                .stream()
-                .anyMatch(t ->
-                        t.getOdontologo() != null &&
-                                t.getOdontologo().getId().equals(odontologoId) &&
-                                !t.getFecha().isBefore(LocalDate.now()));
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (turno.getOdontologo() != null &&
+                    turno.getOdontologo().getId().equals(odontologoId) &&
+                    !turno.getFecha().isBefore(LocalDate.now())) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean validarOcupado(Long idOdon, LocalDate fecha, LocalTime hora) {
-        return turnoRepository.listarTodos()
-                .stream()
-                .anyMatch(t ->
-                        t.getOdontologo() != null &&
-                                t.getOdontologo().getId().equals(idOdon) &&
-                                t.getFecha().equals(fecha) &&
-                                t.getHora().equals(hora) &&
-                                t.getEstado() != EstadoTurno.CANCELADO);
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (turno.getOdontologo() != null &&
+                    turno.getOdontologo().getId().equals(idOdon) &&
+                    turno.getFecha().equals(fecha) &&
+                    turno.getHora().equals(hora) &&
+                    turno.getEstado() != EstadoTurno.CANCELADO) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public List<Turno> buscarPorRango(LocalDate desde, LocalDate hasta) {
-        return turnoRepository.listarTodos()
-                .stream()
-                .filter(t ->
-                        !t.getFecha().isBefore(desde) &&
-                                !t.getFecha().isAfter(hasta))
-                .toList();
+        List<Turno> encontrados = new ArrayList<>();
+
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (!turno.getFecha().isBefore(desde) &&
+                    !turno.getFecha().isAfter(hasta)) {
+
+                encontrados.add(turno);
+            }
+        }
+
+        return encontrados;
+    }
+
+    public List<Turno> buscarPorFecha(LocalDate fecha) {
+        List<Turno> encontrados = new ArrayList<>();
+
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (turno.getFecha().equals(fecha)) {
+                encontrados.add(turno);
+            }
+        }
+
+        return encontrados;
+    }
+
+    public List<Turno> buscarPorEstado(EstadoTurno estado) {
+        List<Turno> encontrados = new ArrayList<>();
+
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (turno.getEstado() == estado) {
+                encontrados.add(turno);
+            }
+        }
+
+        return encontrados;
     }
 
     public List<Turno> buscarPorPaciente(Long pacienteId) {
-        return turnoRepository.listarTodos()
-                .stream()
-                .filter(t ->
-                        t.getPaciente() != null &&
-                                t.getPaciente().getId().equals(pacienteId))
-                .toList();
+        List<Turno> encontrados = new ArrayList<>();
+
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (turno.getPaciente() != null &&
+                    turno.getPaciente().getId().equals(pacienteId)) {
+
+                encontrados.add(turno);
+            }
+        }
+
+        return encontrados;
     }
 
     public List<Turno> buscarPorOdontologo(Long odontologoId) {
-        return turnoRepository.listarTodos()
-                .stream()
-                .filter(t ->
-                        t.getOdontologo() != null &&
-                                t.getOdontologo().getId().equals(odontologoId))
-                .toList();
+        List<Turno> encontrados = new ArrayList<>();
+
+        for (Turno turno : turnoRepository.listarTodos()) {
+            if (turno.getOdontologo() != null &&
+                    turno.getOdontologo().getId().equals(odontologoId)) {
+
+                encontrados.add(turno);
+            }
+        }
+
+        return encontrados;
     }
 }
