@@ -4,6 +4,9 @@ package modelo;
 public class Endodoncista extends Odontologo {
     private boolean usaMicroscopio;
 
+    public Endodoncista() {
+    }
+
     public Endodoncista(boolean usaMicroscopio) {
         this.usaMicroscopio = usaMicroscopio;
     }
@@ -21,5 +24,25 @@ public class Endodoncista extends Odontologo {
     @Override
     public boolean atiendeUrgencias() {
         return true;
+    }
+
+    public boolean isUsaMicroscopio() {
+        return usaMicroscopio;
+    }
+
+    public void setUsaMicroscopio(boolean usaMicroscopio) {
+        this.usaMicroscopio = usaMicroscopio;
+    }
+
+    @Override
+    public String toString() {
+        return "Endodoncista{" +
+                "id=" + getId() +
+                ", nombre='" + getNombre() + '\'' +
+                ", apellido='" + getApellido() + '\'' +
+                ", matricula='" + getMatricula() + '\'' +
+                ", salarioBase=" + getSalarioBase() +
+                ", usaMicroscopio=" + usaMicroscopio +
+                '}';
     }
 }

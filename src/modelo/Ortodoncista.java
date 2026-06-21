@@ -4,6 +4,9 @@ package modelo;
 public class Ortodoncista extends Odontologo  {
     private String tipoBrackets;
 
+    public Ortodoncista() {
+    }
+
     public Ortodoncista(String tipoBrackets) {
         this.tipoBrackets = tipoBrackets;
     }
@@ -21,5 +24,25 @@ public class Ortodoncista extends Odontologo  {
     @Override
     public boolean atiendeUrgencias() {
         return false;
+    }
+
+    public String getTipoBrackets() {
+        return tipoBrackets;
+    }
+
+    public void setTipoBrackets(String tipoBrackets) {
+        this.tipoBrackets = tipoBrackets;
+    }
+
+    @Override
+    public String toString() {
+        return "Ortodoncista{" +
+                "id=" + getId() +
+                ", nombre='" + getNombre() + '\'' +
+                ", apellido='" + getApellido() + '\'' +
+                ", matricula='" + getMatricula() + '\'' +
+                ", salarioBase=" + getSalarioBase() +
+                ", tipoBrackets='" + tipoBrackets + '\'' +
+                '}';
     }
 }

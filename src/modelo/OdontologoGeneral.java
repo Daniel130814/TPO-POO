@@ -5,6 +5,9 @@ public class OdontologoGeneral extends Odontologo {
     private boolean atiendeNinios;
     private int consultorioAsignado;
 
+    public OdontologoGeneral() {
+    }
+
     public OdontologoGeneral(boolean atiendeNinios, int consultorioAsignado) {
         this.atiendeNinios = atiendeNinios;
         this.consultorioAsignado = consultorioAsignado;
@@ -26,5 +29,34 @@ public class OdontologoGeneral extends Odontologo {
     @Override
     public boolean atiendeUrgencias() {
         return true;
+    }
+
+    public boolean isAtiendeNinios() {
+        return atiendeNinios;
+    }
+
+    public void setAtiendeNinios(boolean atiendeNinios) {
+        this.atiendeNinios = atiendeNinios;
+    }
+
+    public int getConsultorioAsignado() {
+        return consultorioAsignado;
+    }
+
+    public void setConsultorioAsignado(int consultorioAsignado) {
+        this.consultorioAsignado = consultorioAsignado;
+    }
+
+    @Override
+    public String toString() {
+        return "OdontologoGeneral{" +
+                "id=" + getId() +
+                ", nombre='" + getNombre() + '\'' +
+                ", apellido='" + getApellido() + '\'' +
+                ", matricula='" + getMatricula() + '\'' +
+                ", salarioBase=" + getSalarioBase() +
+                ", atiendeNinios=" + atiendeNinios +
+                ", consultorioAsignado=" + consultorioAsignado +
+                '}';
     }
 }
