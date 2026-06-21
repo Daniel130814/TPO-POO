@@ -3,14 +3,15 @@ package controlador;
 import modelo.Domicilio;
 import modelo.Paciente;
 import servicio.ServicioPaciente;
-import servicio.ServicioTurno; // Importante para la validación
+import servicio.ServicioTurno;
 import vista.VistaClinica;
+
 import java.util.List;
 
 public class PacienteController {
 
     private ServicioPaciente servicioPaciente;
-    private ServicioTurno servicioTurno; // Agregado para validar bajas
+    private ServicioTurno servicioTurno;
     private VistaClinica vista;
 
     public PacienteController(VistaClinica vista, ServicioPaciente servicioPaciente, ServicioTurno servicioTurno) {
@@ -24,13 +25,26 @@ public class PacienteController {
         while (enMenu) {
             int opcion = vista.mostrarMenuPacientes();
             switch (opcion) {
-                case 1: registrarPaciente(); break;
-                case 2: buscarPacientePorId(); break;
-                case 3: buscarPacientePorDni(); break;
-                case 4: listarPacientes(); break;
-                case 5: eliminarPaciente(); break;
-                case 0: enMenu = false; break;
-                default: vista.mostrarMensaje("Opción inválida.");
+                case 1:
+                    registrarPaciente();
+                    break;
+                case 2:
+                    buscarPacientePorId();
+                    break;
+                case 3:
+                    buscarPacientePorDni();
+                    break;
+                case 4:
+                    listarPacientes();
+                    break;
+                case 5:
+                    eliminarPaciente();
+                    break;
+                case 0:
+                    enMenu = false;
+                    break;
+                default:
+                    vista.mostrarMensaje("Opcion invalida.");
             }
         }
     }
@@ -44,12 +58,11 @@ public class PacienteController {
             String dni = vista.pedirDatoString("DNI");
             String email = vista.pedirDatoString("Email");
             String calle = vista.pedirDatoString("Calle");
-            int nro = vista.pedirDatoInt("Número");
+            int nro = vista.pedirDatoInt("Numero");
             String localidad = vista.pedirDatoString("Localidad");
             String provincia = vista.pedirDatoString("Provincia");
 
             Domicilio dom = new Domicilio(calle, nro, localidad, provincia);
-
             Paciente nuevo = new Paciente(nombre, apellido, dni, email, dom);
 
             servicioPaciente.registrar(nuevo);
@@ -66,7 +79,6 @@ public class PacienteController {
     private void buscarPacientePorId() {
         try {
             Long id = vista.pedirDatoLong("Ingrese ID a buscar");
-
             Paciente p = servicioPaciente.buscarPorId(id);
 
             vista.mostrarMensaje(
@@ -86,7 +98,6 @@ public class PacienteController {
     private void buscarPacientePorDni() {
         try {
             String dni = vista.pedirDatoString("Ingrese DNI a buscar");
-
             Paciente p = servicioPaciente.buscarPorDni(dni);
 
             vista.mostrarMensaje(
@@ -105,23 +116,27 @@ public class PacienteController {
 
     private void listarPacientes() {
         List<Paciente> lista = servicioPaciente.listarOrdenadosPorApellido();
+
         if (lista.isEmpty()) {
             vista.mostrarMensaje("No hay pacientes registrados.");
         } else {
             vista.mostrarMensaje("\n--- LISTADO DE PACIENTES ---");
             for (Paciente p : lista) {
-                vista.mostrarMensaje("ID: " + p.getId() + " | " + p.getNombre() + " " + p.getApellido() + " | DNI: " + p.getDni());
+                vista.mostrarMensaje(
+                        "ID: " + p.getId() +
+                                " | " + p.getNombre() +
+                                " " + p.getApellido() +
+                                " | DNI: " + p.getDni()
+                );
             }
         }
+
         vista.pausar();
     }
 
-
     private void eliminarPaciente() {
         try {
-            Long id = vista.pedirDatoLong(
-                    "Ingrese ID del paciente a eliminar"
-            );
+            Long id = vista.pedirDatoLong("Ingrese ID del paciente a eliminar");
 
             servicioPaciente.buscarPorId(id);
 
@@ -131,9 +146,7 @@ public class PacienteController {
                 );
             } else {
                 servicioPaciente.eliminarPorId(id);
-                vista.mostrarMensaje(
-                        "Paciente eliminado correctamente."
-                );
+                vista.mostrarMensaje("Paciente eliminado correctamente.");
             }
 
         } catch (Exception e) {

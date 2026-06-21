@@ -7,26 +7,35 @@ import servicio.ServicioTurno;
 import vista.VistaClinica;
 
 public class Main {
-    public static void main(String[] args) {
+    private static final String ARCHIVO_PACIENTES = "data/pacientes.txt";
+    private static final String ARCHIVO_ODONTOLOGOS = "data/odontologos.txt";
+    private static final String ARCHIVO_TURNOS = "data/turnos.txt";
 
-        // 1. Instanciamos la Vista compartida
+    public static void main(String[] args) {
         VistaClinica vista = new VistaClinica();
 
-        // 2. Instanciamos los Servicios (los motores de datos)
         ServicioPaciente servicioPaciente = new ServicioPaciente();
         ServicioOdontologo servicioOdontologo = new ServicioOdontologo();
         ServicioTurno servicioTurno = new ServicioTurno();
 
-        // 3. Instanciamos los Controladores
-        // Importante: Pasamos servicioTurno a todos para las validaciones de bajas y disponibilidad
-        PacienteController pacienteController = new PacienteController(vista, servicioPaciente, servicioTurno);
-        OdontologoController odontologoController = new OdontologoController(vista, servicioOdontologo, servicioTurno);
-        TurnoController turnoController = new TurnoController(vista, servicioTurno, servicioPaciente, servicioOdontologo);
+        try {
+            servicioPaciente.cargarDesdeArchivo(ARCHIVO_PACIENTES);
+            servicioOdontologo.cargarDesdeArchivo(ARCHIVO_ODONTOLOGOS);
+            servicioTurno.cargarDesdeArchivo(ARCHIVO_TURNOS, servicioPaciente, servicioOdontologo);
+        } catch (Exception e) {
+            vista.mostrarMensaje("No se pudieron cargar los datos guardados: " + e.getMessage());
+        }
+
+        PacienteController pacienteController =
+                new PacienteController(vista, servicioPaciente, servicioTurno);
+        OdontologoController odontologoController =
+                new OdontologoController(vista, servicioOdontologo, servicioTurno);
+        TurnoController turnoController =
+                new TurnoController(vista, servicioTurno, servicioPaciente, servicioOdontologo);
 
         boolean ejecutando = true;
 
-        // 4. Bucle del Menú Principal
-        vista.mostrarMensaje("=== BIENVENIDO AL SISTEMA DE URGENCIAS ODONTOLÓGICAS ===");
+        vista.mostrarMensaje("=== BIENVENIDO AL SISTEMA DE URGENCIAS ODONTOLOGICAS ===");
 
         while (ejecutando) {
             int opcion = vista.mostrarMenuPrincipal();
@@ -43,13 +52,29 @@ public class Main {
                     break;
                 case 0:
                     ejecutando = false;
-                    vista.mostrarMensaje("Guardando cambios y saliendo del sistema... ¡Hasta luego!");
+                    guardarDatos(vista, servicioPaciente, servicioOdontologo, servicioTurno);
                     break;
                 default:
-                    vista.mostrarMensaje("Opción no válida. Intente nuevamente.");
+                    vista.mostrarMensaje("Opcion no valida. Intente nuevamente.");
             }
         }
 
         vista.cerrar();
+    }
+
+    private static void guardarDatos(
+            VistaClinica vista,
+            ServicioPaciente servicioPaciente,
+            ServicioOdontologo servicioOdontologo,
+            ServicioTurno servicioTurno) {
+
+        try {
+            servicioPaciente.guardarEnArchivo(ARCHIVO_PACIENTES);
+            servicioOdontologo.guardarEnArchivo(ARCHIVO_ODONTOLOGOS);
+            servicioTurno.guardarEnArchivo(ARCHIVO_TURNOS);
+            vista.mostrarMensaje("Guardando cambios y saliendo del sistema... Hasta luego!");
+        } catch (Exception e) {
+            vista.mostrarMensaje("No se pudieron guardar los datos: " + e.getMessage());
+        }
     }
 }

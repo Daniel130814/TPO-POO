@@ -3,8 +3,10 @@ package servicio;
 import Exceptions.DatoInvalidoException;
 import Exceptions.MatriculaDuplicadaException;
 import Exceptions.OdontologoNoEncontrado;
-import modelo.*;
+import modelo.Endodoncista;
 import modelo.Odontologo;
+import modelo.OdontologoGeneral;
+import modelo.Ortodoncista;
 import repositorio.IRepositorio;
 import repositorio.RepositorioOdontologo;
 
@@ -26,14 +28,14 @@ public class ServicioOdontologo implements IService<Odontologo> {
         if (odontologo.getMatricula() == null ||
                 odontologo.getMatricula().trim().isEmpty()) {
             throw new DatoInvalidoException(
-                    "La matrícula del odontólogo es obligatoria."
+                    "La matricula del odontologo es obligatoria."
             );
         }
 
         for (Odontologo o : odontologoIRepositorio.listarTodos()) {
             if (o.getMatricula().equals(odontologo.getMatricula())) {
                 throw new MatriculaDuplicadaException(
-                        "Ya existe un profesional registrado con matrícula: "
+                        "Ya existe un profesional registrado con matricula: "
                                 + odontologo.getMatricula()
                 );
             }
@@ -50,7 +52,7 @@ public class ServicioOdontologo implements IService<Odontologo> {
 
         if (odontologo == null) {
             throw new OdontologoNoEncontrado(
-                    "No existe un odontólogo con ID: " + id
+                    "No existe un odontologo con ID: " + id
             );
         }
 
@@ -88,7 +90,7 @@ public class ServicioOdontologo implements IService<Odontologo> {
         }
 
         throw new OdontologoNoEncontrado(
-                "No existe un odontólogo con matrícula: " + matricula
+                "No existe un odontologo con matricula: " + matricula
         );
     }
 
@@ -105,5 +107,17 @@ public class ServicioOdontologo implements IService<Odontologo> {
         }
 
         return filtrados;
+    }
+
+    public void guardarEnArchivo(String ruta) {
+        obtenerRepositorioOdontologo().guardarEnArchivo(ruta);
+    }
+
+    public void cargarDesdeArchivo(String ruta) {
+        obtenerRepositorioOdontologo().cargarDesdeArchivo(ruta);
+    }
+
+    private RepositorioOdontologo obtenerRepositorioOdontologo() {
+        return (RepositorioOdontologo) odontologoIRepositorio;
     }
 }

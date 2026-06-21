@@ -111,5 +111,16 @@ public class ServicioPaciente implements IService<Paciente> {
         );
     }
 
+    public void guardarEnArchivo(String ruta) {
+        obtenerRepositorioPaciente().guardarEnArchivo(ruta);
+    }
+
+    public void cargarDesdeArchivo(String ruta) {
+        obtenerRepositorioPaciente().cargarDesdeArchivo(ruta);
+    }
+
+    private RepositorioPaciente obtenerRepositorioPaciente() {
+        return (RepositorioPaciente) pacienteRepository;
+    }
 
 }
