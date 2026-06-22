@@ -92,9 +92,43 @@ public class ServicioTurno implements IService<Turno> {
 
     @Override
     public void actualizar(Turno turnoModificado)
-            throws TurnoNoEncontradoException {
+            throws TurnoNoEncontradoException, DatoInvalidoException, TurnoYaReservadoException {
 
         buscarPorId(turnoModificado.getId());
+
+        validarDatosTurno(turnoModificado);
+
+        if (turnoModificado.getPaciente() == null) {
+            throw new DatoInvalidoException(
+                    "El turno debe tener un paciente asignado."
+            );
+        }
+
+        if (turnoModificado.getOdontologo() == null) {
+            throw new DatoInvalidoException(
+                    "El turno debe tener un odontologo asignado."
+            );
+        }
+
+        if (validarOcupado(
+                turnoModificado.getOdontologo().getId(),
+                turnoModificado.getFecha(),
+                turnoModificado.getHora(),
+                turnoModificado.getId())) {
+
+            throw new TurnoYaReservadoException(
+                    "El odontologo ya tiene un turno reservado en ese horario."
+            );
+        }
+
+        if (turnoModificado instanceof TurnoUrgente &&
+                !turnoModificado.getOdontologo().atiendeUrgencias()) {
+
+            throw new DatoInvalidoException(
+                    "El profesional seleccionado no atiende urgencias."
+            );
+        }
+
         turnoRepository.actualizar(turnoModificado);
     }
 
@@ -130,11 +164,19 @@ public class ServicioTurno implements IService<Turno> {
     }
 
     public boolean validarOcupado(Long idOdon, LocalDate fecha, LocalTime hora) {
+        return validarOcupado(idOdon, fecha, hora, null);
+    }
+
+    private boolean validarOcupado(Long idOdon, LocalDate fecha, LocalTime hora, Long idTurnoIgnorado) {
         if (idOdon == null || fecha == null || hora == null) {
             return false;
         }
 
         for (Turno turno : turnoRepository.listarTodos()) {
+            if (idTurnoIgnorado != null && turno.getId().equals(idTurnoIgnorado)) {
+                continue;
+            }
+
             if (turno.getOdontologo() != null &&
                     turno.getOdontologo().getId().equals(idOdon) &&
                     turno.getFecha().equals(fecha) &&

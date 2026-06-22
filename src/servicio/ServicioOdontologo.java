@@ -69,9 +69,29 @@ public class ServicioOdontologo implements IService<Odontologo> {
 
     @Override
     public void actualizar(Odontologo odontologoModificado)
-            throws OdontologoNoEncontrado {
+            throws OdontologoNoEncontrado, DatoInvalidoException, MatriculaDuplicadaException {
 
         buscarPorId(odontologoModificado.getId());
+
+        if (odontologoModificado.getMatricula() == null ||
+                odontologoModificado.getMatricula().trim().isEmpty()) {
+
+            throw new DatoInvalidoException(
+                    "La matricula del odontologo es obligatoria."
+            );
+        }
+
+        for (Odontologo o : odontologoIRepositorio.listarTodos()) {
+            if (!o.getId().equals(odontologoModificado.getId()) &&
+                    o.getMatricula().equals(odontologoModificado.getMatricula())) {
+
+                throw new MatriculaDuplicadaException(
+                        "Ya existe un profesional registrado con matricula: "
+                                + odontologoModificado.getMatricula()
+                );
+            }
+        }
+
         odontologoIRepositorio.actualizar(odontologoModificado);
     }
 

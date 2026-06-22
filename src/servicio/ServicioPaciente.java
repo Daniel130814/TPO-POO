@@ -67,9 +67,27 @@ public class ServicioPaciente implements IService<Paciente> {
 
     @Override
     public void actualizar(Paciente pacienteModificado)
-            throws PacienteNoEncontradoException {
+            throws PacienteNoEncontradoException, DatoInvalidoException, DniDuplicadoException {
 
         buscarPorId(pacienteModificado.getId());
+
+        if (pacienteModificado.getNombre() == null || pacienteModificado.getNombre().trim().isEmpty()) {
+            throw new DatoInvalidoException("El nombre del paciente es obligatorio.");
+        }
+
+        if (pacienteModificado.getDni() == null || pacienteModificado.getDni().trim().isEmpty()) {
+            throw new DatoInvalidoException("El DNI del paciente es obligatorio.");
+        }
+
+        for (Paciente p : pacienteRepository.listarTodos()) {
+            if (!p.getId().equals(pacienteModificado.getId()) &&
+                    p.getDni().equals(pacienteModificado.getDni())) {
+
+                throw new DniDuplicadoException(
+                        "Ya existe un paciente registrado con DNI: " + pacienteModificado.getDni()
+                );
+            }
+        }
 
         pacienteRepository.actualizar(pacienteModificado);
     }
