@@ -1,10 +1,10 @@
-import controlador.OdontologoController;
-import controlador.PacienteController;
-import controlador.TurnoController;
+import presentacion.gui.VentanaPrincipal;
 import servicio.ServicioOdontologo;
 import servicio.ServicioPaciente;
 import servicio.ServicioTurno;
-import vista.VistaClinica;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class Main {
     private static final String ARCHIVO_PACIENTES = "data/pacientes.txt";
@@ -12,69 +12,41 @@ public class Main {
     private static final String ARCHIVO_TURNOS = "data/turnos.txt";
 
     public static void main(String[] args) {
-        VistaClinica vista = new VistaClinica();
+        final ServicioPaciente servicioPaciente = new ServicioPaciente();
+        final ServicioOdontologo servicioOdontologo = new ServicioOdontologo();
+        final ServicioTurno servicioTurno = new ServicioTurno();
 
-        ServicioPaciente servicioPaciente = new ServicioPaciente();
-        ServicioOdontologo servicioOdontologo = new ServicioOdontologo();
-        ServicioTurno servicioTurno = new ServicioTurno();
+        cargarDatos(servicioPaciente, servicioOdontologo, servicioTurno);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                VentanaPrincipal ventanaPrincipal = new VentanaPrincipal(
+                        servicioPaciente,
+                        servicioOdontologo,
+                        servicioTurno
+                );
+                ventanaPrincipal.setVisible(true);
+            }
+        });
+    }
+
+    private static void cargarDatos(
+            ServicioPaciente servicioPaciente,
+            ServicioOdontologo servicioOdontologo,
+            ServicioTurno servicioTurno) {
 
         try {
             servicioPaciente.cargarDesdeArchivo(ARCHIVO_PACIENTES);
             servicioOdontologo.cargarDesdeArchivo(ARCHIVO_ODONTOLOGOS);
             servicioTurno.cargarDesdeArchivo(ARCHIVO_TURNOS, servicioPaciente, servicioOdontologo);
         } catch (Exception e) {
-            vista.mostrarMensaje("No se pudieron cargar los datos guardados: " + e.getMessage());
-        }
-
-        PacienteController pacienteController =
-                new PacienteController(vista, servicioPaciente, servicioTurno);
-        OdontologoController odontologoController =
-                new OdontologoController(vista, servicioOdontologo, servicioTurno);
-        TurnoController turnoController =
-                new TurnoController(vista, servicioTurno, servicioPaciente, servicioOdontologo);
-
-        boolean ejecutando = true;
-
-        vista.mostrarMensaje("=== BIENVENIDO AL SISTEMA DE URGENCIAS ODONTOLOGICAS ===");
-
-        while (ejecutando) {
-            int opcion = vista.mostrarMenuPrincipal();
-
-            switch (opcion) {
-                case 1:
-                    pacienteController.iniciar();
-                    break;
-                case 2:
-                    odontologoController.iniciar();
-                    break;
-                case 3:
-                    turnoController.iniciar();
-                    break;
-                case 0:
-                    ejecutando = false;
-                    guardarDatos(vista, servicioPaciente, servicioOdontologo, servicioTurno);
-                    break;
-                default:
-                    vista.mostrarMensaje("Opcion no valida. Intente nuevamente.");
-            }
-        }
-
-        vista.cerrar();
-    }
-
-    private static void guardarDatos(
-            VistaClinica vista,
-            ServicioPaciente servicioPaciente,
-            ServicioOdontologo servicioOdontologo,
-            ServicioTurno servicioTurno) {
-
-        try {
-            servicioPaciente.guardarEnArchivo(ARCHIVO_PACIENTES);
-            servicioOdontologo.guardarEnArchivo(ARCHIVO_ODONTOLOGOS);
-            servicioTurno.guardarEnArchivo(ARCHIVO_TURNOS);
-            vista.mostrarMensaje("Guardando cambios y saliendo del sistema... Hasta luego!");
-        } catch (Exception e) {
-            vista.mostrarMensaje("No se pudieron guardar los datos: " + e.getMessage());
+            JOptionPane.showMessageDialog(
+                    null,
+                    "No se pudieron cargar los datos guardados: " + e.getMessage(),
+                    "Error de carga",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }
