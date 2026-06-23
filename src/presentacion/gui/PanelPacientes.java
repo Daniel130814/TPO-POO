@@ -1,8 +1,8 @@
 package presentacion.gui;
 
-import Exceptions.DatoInvalidoException;
-import Exceptions.DniDuplicadoException;
-import Exceptions.PacienteNoEncontradoException;
+import exceptions.DatoInvalidoException;
+import exceptions.DniDuplicadoException;
+import exceptions.PacienteNoEncontradoException;
 import controller.PacienteController;
 import modelo.Domicilio;
 import modelo.Paciente;
@@ -347,6 +347,8 @@ public class PanelPacientes extends JPanel {
             mostrarMensaje("Paciente eliminado correctamente.");
             limpiarFormulario();
             cargarPacientesEnTabla();
+        } catch (DatoInvalidoException e) {
+            mostrarError(e.getMessage());
         } catch (PacienteNoEncontradoException e) {
             mostrarError(e.getMessage());
         }

@@ -1,8 +1,8 @@
 package presentacion.gui;
 
-import Exceptions.DatoInvalidoException;
-import Exceptions.MatriculaDuplicadaException;
-import Exceptions.OdontologoNoEncontrado;
+import exceptions.DatoInvalidoException;
+import exceptions.MatriculaDuplicadaException;
+import exceptions.OdontologoNoEncontradoException;
 import controller.OdontologoController;
 import modelo.Endodoncista;
 import modelo.Odontologo;
@@ -233,7 +233,7 @@ public class PanelOdontologos extends JPanel {
         try {
             Odontologo odontologo = odontologoController.buscarPorMatricula(matricula);
             mostrarVentanaModificarDato(odontologo);
-        } catch (OdontologoNoEncontrado e) {
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
         }
     }
@@ -321,7 +321,7 @@ public class PanelOdontologos extends JPanel {
             seleccionarOdontologoEnTabla(modificado.getId());
         } catch (MatriculaDuplicadaException e) {
             mostrarError(e.getMessage());
-        } catch (OdontologoNoEncontrado e) {
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
         } catch (DatoInvalidoException e) {
             mostrarError(e.getMessage());
@@ -374,7 +374,7 @@ public class PanelOdontologos extends JPanel {
 
         try {
             odontologo = odontologoController.buscarPorMatricula(matricula);
-        } catch (OdontologoNoEncontrado e) {
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
             return;
         }
@@ -395,7 +395,9 @@ public class PanelOdontologos extends JPanel {
             mostrarMensaje("Odontologo eliminado correctamente.");
             limpiarFormulario();
             cargarOdontologosEnTabla();
-        } catch (OdontologoNoEncontrado e) {
+        } catch (DatoInvalidoException e) {
+            mostrarError(e.getMessage());
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
         }
     }
@@ -442,7 +444,7 @@ public class PanelOdontologos extends JPanel {
             Odontologo odontologo = odontologoController.buscarPorMatricula(matricula);
             cargarOdontologoEnFormulario(odontologo);
             seleccionarOdontologoEnTabla(odontologo.getId());
-        } catch (OdontologoNoEncontrado e) {
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
         }
     }
@@ -459,7 +461,7 @@ public class PanelOdontologos extends JPanel {
         try {
             Odontologo odontologo = odontologoController.buscarPorId(id);
             cargarOdontologoEnFormulario(odontologo);
-        } catch (OdontologoNoEncontrado e) {
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
         }
     }

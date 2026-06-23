@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class TurnoYaReservadoException extends RuntimeException {
     public TurnoYaReservadoException(String message) {

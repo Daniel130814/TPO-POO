@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class PacienteNoEncontradoException extends RuntimeException {
     public PacienteNoEncontradoException(String message) {

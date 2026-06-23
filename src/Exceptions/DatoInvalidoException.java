@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class DatoInvalidoException extends RuntimeException {
     public DatoInvalidoException(String message) {

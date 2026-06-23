@@ -1,8 +1,8 @@
 package servicio;
 
-import Exceptions.DatoInvalidoException;
-import Exceptions.MatriculaDuplicadaException;
-import Exceptions.OdontologoNoEncontrado;
+import exceptions.DatoInvalidoException;
+import exceptions.MatriculaDuplicadaException;
+import exceptions.OdontologoNoEncontradoException;
 import modelo.Endodoncista;
 import modelo.Odontologo;
 import modelo.OdontologoGeneral;
@@ -16,9 +16,14 @@ import java.util.List;
 public class ServicioOdontologo implements IService<Odontologo> {
 
     private IRepositorio<Odontologo> odontologoIRepositorio;
+    private ServicioTurno servicioTurno;
 
     public ServicioOdontologo() {
         this.odontologoIRepositorio = new RepositorioOdontologo();
+    }
+
+    public void setServicioTurno(ServicioTurno servicioTurno) {
+        this.servicioTurno = servicioTurno;
     }
 
     @Override
@@ -46,12 +51,12 @@ public class ServicioOdontologo implements IService<Odontologo> {
 
     @Override
     public Odontologo buscarPorId(Long id)
-            throws OdontologoNoEncontrado {
+            throws OdontologoNoEncontradoException {
 
         Odontologo odontologo = odontologoIRepositorio.buscarPorId(id);
 
         if (odontologo == null) {
-            throw new OdontologoNoEncontrado(
+            throw new OdontologoNoEncontradoException(
                     "No existe un odontologo con ID: " + id
             );
         }
@@ -61,15 +66,22 @@ public class ServicioOdontologo implements IService<Odontologo> {
 
     @Override
     public void eliminarPorId(Long id)
-            throws OdontologoNoEncontrado {
+            throws OdontologoNoEncontradoException {
 
         buscarPorId(id);
+
+        if (servicioTurno != null && !servicioTurno.buscarPorOdontologo(id).isEmpty()) {
+            throw new DatoInvalidoException(
+                    "No se puede eliminar el odontologo porque tiene turnos asociados."
+            );
+        }
+
         odontologoIRepositorio.eliminarPorId(id);
     }
 
     @Override
     public void actualizar(Odontologo odontologoModificado)
-            throws OdontologoNoEncontrado, DatoInvalidoException, MatriculaDuplicadaException {
+            throws OdontologoNoEncontradoException, DatoInvalidoException, MatriculaDuplicadaException {
 
         buscarPorId(odontologoModificado.getId());
 
@@ -101,7 +113,7 @@ public class ServicioOdontologo implements IService<Odontologo> {
     }
 
     public Odontologo buscarPorMatricula(String matricula)
-            throws OdontologoNoEncontrado {
+            throws OdontologoNoEncontradoException {
 
         for (Odontologo o : odontologoIRepositorio.listarTodos()) {
             if (o.getMatricula().equals(matricula)) {
@@ -109,7 +121,7 @@ public class ServicioOdontologo implements IService<Odontologo> {
             }
         }
 
-        throw new OdontologoNoEncontrado(
+        throw new OdontologoNoEncontradoException(
                 "No existe un odontologo con matricula: " + matricula
         );
     }

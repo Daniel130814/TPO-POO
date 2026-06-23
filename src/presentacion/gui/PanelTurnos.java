@@ -1,8 +1,8 @@
 package presentacion.gui;
 
-import Exceptions.DatoInvalidoException;
-import Exceptions.TurnoNoEncontradoException;
-import Exceptions.TurnoYaReservadoException;
+import exceptions.DatoInvalidoException;
+import exceptions.TurnoNoEncontradoException;
+import exceptions.TurnoYaReservadoException;
 import controller.OdontologoController;
 import controller.PacienteController;
 import controller.TurnoController;

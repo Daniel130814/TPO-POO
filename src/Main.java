@@ -16,6 +16,9 @@ public class Main {
         final ServicioOdontologo servicioOdontologo = new ServicioOdontologo();
         final ServicioTurno servicioTurno = new ServicioTurno();
 
+        servicioPaciente.setServicioTurno(servicioTurno);
+        servicioOdontologo.setServicioTurno(servicioTurno);
+
         cargarDatos(servicioPaciente, servicioOdontologo, servicioTurno);
 
         SwingUtilities.invokeLater(new Runnable() {

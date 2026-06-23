@@ -1,8 +1,8 @@
 package servicio;
 
-import Exceptions.DatoInvalidoException;
-import Exceptions.DniDuplicadoException;
-import Exceptions.PacienteNoEncontradoException;
+import exceptions.DatoInvalidoException;
+import exceptions.DniDuplicadoException;
+import exceptions.PacienteNoEncontradoException;
 import modelo.Paciente;
 import repositorio.IRepositorio;
 import repositorio.RepositorioPaciente;
@@ -13,10 +13,15 @@ import java.util.List;
 public class ServicioPaciente implements IService<Paciente> {
 
     private IRepositorio<Paciente> pacienteRepository;
+    private ServicioTurno servicioTurno;
 
     public ServicioPaciente() {
         // Instanciamos el repositorio
         this.pacienteRepository = new RepositorioPaciente();
+    }
+
+    public void setServicioTurno(ServicioTurno servicioTurno) {
+        this.servicioTurno = servicioTurno;
     }
 
     @Override
@@ -60,6 +65,12 @@ public class ServicioPaciente implements IService<Paciente> {
     public void eliminarPorId(Long id) throws PacienteNoEncontradoException {
 
         buscarPorId(id); // valida existencia
+
+        if (servicioTurno != null && !servicioTurno.buscarPorPaciente(id).isEmpty()) {
+            throw new DatoInvalidoException(
+                    "No se puede eliminar el paciente porque tiene turnos asociados."
+            );
+        }
 
         pacienteRepository.eliminarPorId(id);
     }

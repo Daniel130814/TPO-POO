@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class MatriculaDuplicadaException extends RuntimeException {
     public MatriculaDuplicadaException(String message) {

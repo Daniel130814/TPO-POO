@@ -1,8 +1,8 @@
 package presentacion.gui;
 
-import Exceptions.DatoInvalidoException;
-import Exceptions.OdontologoNoEncontrado;
-import Exceptions.PacienteNoEncontradoException;
+import exceptions.DatoInvalidoException;
+import exceptions.OdontologoNoEncontradoException;
+import exceptions.PacienteNoEncontradoException;
 import controller.OdontologoController;
 import controller.PacienteController;
 import controller.TurnoController;
@@ -173,7 +173,7 @@ public class PanelBusquedas extends JPanel {
         try {
             Odontologo odontologo = odontologoController.buscarPorMatricula(matricula);
             mostrarOdontologo(odontologo);
-        } catch (OdontologoNoEncontrado e) {
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
         }
     }
@@ -207,7 +207,7 @@ public class PanelBusquedas extends JPanel {
             Odontologo odontologo = odontologoController.buscarPorMatricula(matricula);
             List<Turno> turnos = turnoController.buscarPorOdontologo(odontologo.getId());
             mostrarTurnos(turnos);
-        } catch (OdontologoNoEncontrado e) {
+        } catch (OdontologoNoEncontradoException e) {
             mostrarError(e.getMessage());
         } catch (DatoInvalidoException e) {
             mostrarError(e.getMessage());
