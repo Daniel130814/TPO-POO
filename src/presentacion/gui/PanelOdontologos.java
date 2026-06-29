@@ -150,7 +150,6 @@ public class PanelOdontologos extends JPanel {
         JButton botonGuardar = new JButton("Guardar");
         JButton botonModificar = new JButton("Modificar");
         JButton botonEliminar = new JButton("Eliminar");
-        JButton botonBuscarMatricula = new JButton("Buscar por matricula");
         JButton botonRefrescar = new JButton("Refrescar listado");
 
         botonNuevo.addActionListener(new ActionListener() {
@@ -181,13 +180,6 @@ public class PanelOdontologos extends JPanel {
             }
         });
 
-        botonBuscarMatricula.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarPorMatricula();
-            }
-        });
-
         botonRefrescar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -199,7 +191,6 @@ public class PanelOdontologos extends JPanel {
         panelBotones.add(botonGuardar);
         panelBotones.add(botonModificar);
         panelBotones.add(botonEliminar);
-        panelBotones.add(botonBuscarMatricula);
         panelBotones.add(botonRefrescar);
 
         return panelBotones;
@@ -431,22 +422,6 @@ public class PanelOdontologos extends JPanel {
         }
 
         return matricula;
-    }
-
-    private void buscarPorMatricula() {
-        String matricula = pedirMatricula("Ingrese matricula a buscar");
-
-        if (matricula == null) {
-            return;
-        }
-
-        try {
-            Odontologo odontologo = odontologoController.buscarPorMatricula(matricula);
-            cargarOdontologoEnFormulario(odontologo);
-            seleccionarOdontologoEnTabla(odontologo.getId());
-        } catch (OdontologoNoEncontradoException e) {
-            mostrarError(e.getMessage());
-        }
     }
 
     private void cargarOdontologoSeleccionado() {

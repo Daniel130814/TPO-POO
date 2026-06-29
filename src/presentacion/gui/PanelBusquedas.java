@@ -6,22 +6,18 @@ import exceptions.PacienteNoEncontradoException;
 import controller.OdontologoController;
 import controller.PacienteController;
 import controller.TurnoController;
-import modelo.EstadoTurno;
 import modelo.Odontologo;
 import modelo.Paciente;
 import modelo.Turno;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,9 +32,6 @@ public class PanelBusquedas extends JPanel {
 
     private JTable tablaResultados;
     private DefaultTableModel modeloTabla;
-
-    private JTextField campoBusqueda;
-    private JComboBox<EstadoTurno> comboEstado;
 
     public PanelBusquedas(
             PacienteController pacienteController,
@@ -64,16 +57,11 @@ public class PanelBusquedas extends JPanel {
         JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelAcciones.setBorder(BorderFactory.createTitledBorder("Busquedas"));
 
-        campoBusqueda = new JTextField(16);
-        comboEstado = new JComboBox<EstadoTurno>(EstadoTurno.values());
-
         JButton botonPacienteDni = new JButton("Paciente por DNI");
         JButton botonOdontologoMatricula = new JButton("Odontologo por matricula");
         JButton botonTurnosPaciente = new JButton("Turnos por paciente");
         JButton botonTurnosOdontologo = new JButton("Turnos por odontologo");
         JButton botonTurnosFecha = new JButton("Turnos por fecha");
-        JButton botonTurnosEstado = new JButton("Turnos por estado");
-        JButton botonLimpiar = new JButton("Limpiar");
 
         botonPacienteDni.addActionListener(new ActionListener() {
             @Override
@@ -110,30 +98,11 @@ public class PanelBusquedas extends JPanel {
             }
         });
 
-        botonTurnosEstado.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                listarTurnosPorEstado();
-            }
-        });
-
-        botonLimpiar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                campoBusqueda.setText("");
-                limpiarTabla();
-            }
-        });
-
-        panelAcciones.add(campoBusqueda);
         panelAcciones.add(botonPacienteDni);
         panelAcciones.add(botonOdontologoMatricula);
         panelAcciones.add(botonTurnosPaciente);
         panelAcciones.add(botonTurnosOdontologo);
         panelAcciones.add(botonTurnosFecha);
-        panelAcciones.add(comboEstado);
-        panelAcciones.add(botonTurnosEstado);
-        panelAcciones.add(botonLimpiar);
 
         return panelAcciones;
     }
@@ -232,16 +201,6 @@ public class PanelBusquedas extends JPanel {
         }
     }
 
-    private void listarTurnosPorEstado() {
-        try {
-            EstadoTurno estado = (EstadoTurno) comboEstado.getSelectedItem();
-            List<Turno> turnos = turnoController.buscarPorEstado(estado);
-            mostrarTurnos(turnos);
-        } catch (DatoInvalidoException e) {
-            mostrarError(e.getMessage());
-        }
-    }
-
     private void mostrarPaciente(Paciente paciente) {
         configurarColumnas(new String[]{"ID", "Nombre", "Apellido", "DNI", "Email", "Localidad"});
 
@@ -302,14 +261,7 @@ public class PanelBusquedas extends JPanel {
         }
     }
 
-    private void limpiarTabla() {
-        modeloTabla.setColumnCount(0);
-        modeloTabla.setRowCount(0);
-    }
-
     private String pedirDato(String mensaje) {
-        String valorInicial = campoBusqueda.getText().trim();
-
         String valor = (String) JOptionPane.showInputDialog(
                 this,
                 mensaje,
@@ -317,7 +269,7 @@ public class PanelBusquedas extends JPanel {
                 JOptionPane.QUESTION_MESSAGE,
                 null,
                 null,
-                valorInicial
+                ""
         );
 
         if (valor == null) {
@@ -327,19 +279,11 @@ public class PanelBusquedas extends JPanel {
         valor = valor.trim();
 
         if (valor.isEmpty()) {
-            marcarBusquedaInvalida("Debe ingresar un valor para buscar.");
+            mostrarError("Debe ingresar un valor para buscar.");
             return null;
         }
 
-        campoBusqueda.setBackground(Color.WHITE);
-        campoBusqueda.setText(valor);
         return valor;
-    }
-
-    private void marcarBusquedaInvalida(String mensaje) {
-        campoBusqueda.setBackground(new Color(255, 230, 230));
-        campoBusqueda.requestFocus();
-        mostrarError(mensaje);
     }
 
     private String obtenerNombrePaciente(Turno turno) {

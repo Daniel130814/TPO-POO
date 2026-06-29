@@ -136,7 +136,6 @@ public class PanelPacientes extends JPanel {
         JButton botonGuardar = new JButton("Guardar");
         JButton botonModificar = new JButton("Modificar");
         JButton botonEliminar = new JButton("Eliminar");
-        JButton botonBuscarDni = new JButton("Buscar por DNI");
         JButton botonRefrescar = new JButton("Refrescar listado");
 
         botonNuevo.addActionListener(new ActionListener() {
@@ -167,13 +166,6 @@ public class PanelPacientes extends JPanel {
             }
         });
 
-        botonBuscarDni.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarPorDni();
-            }
-        });
-
         botonRefrescar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -185,7 +177,6 @@ public class PanelPacientes extends JPanel {
         panelBotones.add(botonGuardar);
         panelBotones.add(botonModificar);
         panelBotones.add(botonEliminar);
-        panelBotones.add(botonBuscarDni);
         panelBotones.add(botonRefrescar);
 
         return panelBotones;
@@ -383,22 +374,6 @@ public class PanelPacientes extends JPanel {
         }
 
         return dni;
-    }
-
-    private void buscarPorDni() {
-        String dni = pedirDni("Ingrese DNI a buscar");
-
-        if (dni == null) {
-            return;
-        }
-
-        try {
-            Paciente paciente = pacienteController.buscarPorDni(dni);
-            cargarPacienteEnFormulario(paciente);
-            seleccionarPacienteEnTabla(paciente.getId());
-        } catch (PacienteNoEncontradoException e) {
-            mostrarError(e.getMessage());
-        }
     }
 
     private void cargarPacienteSeleccionado() {
