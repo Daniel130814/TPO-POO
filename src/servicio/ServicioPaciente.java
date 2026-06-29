@@ -8,6 +8,7 @@ import repositorio.IRepositorio;
 import repositorio.RepositorioPaciente;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ServicioPaciente implements IService<Paciente> {
@@ -102,24 +103,15 @@ public class ServicioPaciente implements IService<Paciente> {
 
         pacienteRepository.actualizar(pacienteModificado);
     }
-    
+
+
+    //Ordena la lista por apellidos, estos usan la interfaz de la clase paciente (compare to)
     public List<Paciente> listarOrdenadosPorApellido() {
         List<Paciente> ordenados = new ArrayList<>(pacienteRepository.listarTodos());
-
-        for (int i = 0; i < ordenados.size() - 1; i++) {
-            for (int j = 0; j < ordenados.size() - 1 - i; j++) {
-                Paciente actual = ordenados.get(j);
-                Paciente siguiente = ordenados.get(j + 1);
-
-                if (actual.getApellido().compareToIgnoreCase(siguiente.getApellido()) > 0) {
-                    ordenados.set(j, siguiente);
-                    ordenados.set(j + 1, actual);
-                }
-            }
-        }
-
+        Collections.sort(ordenados);
         return ordenados;
     }
+
 
     @Override
     public List<Paciente> listarTodos() {

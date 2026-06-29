@@ -21,9 +21,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class VentanaPrincipal extends JFrame {
-    private static final String ARCHIVO_PACIENTES = "data/pacientes.txt";
-    private static final String ARCHIVO_ODONTOLOGOS = "data/odontologos.txt";
-    private static final String ARCHIVO_TURNOS = "data/turnos.txt";
+    private static final String ARCHIVO_PACIENTES = "data/pacientes.csv";
+    private static final String ARCHIVO_ODONTOLOGOS = "data/odontologos.csv";
+    private static final String ARCHIVO_TURNOS = "data/turnos.csv";
 
     private static final String CARD_PACIENTES = "PACIENTES";
     private static final String CARD_ODONTOLOGOS = "ODONTOLOGOS";

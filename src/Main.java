@@ -7,9 +7,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 public class Main {
-    private static final String ARCHIVO_PACIENTES = "data/pacientes.txt";
-    private static final String ARCHIVO_ODONTOLOGOS = "data/odontologos.txt";
-    private static final String ARCHIVO_TURNOS = "data/turnos.txt";
+    private static final String ARCHIVO_PACIENTES = "data/pacientes.csv";
+    private static final String ARCHIVO_ODONTOLOGOS = "data/odontologos.csv";
+    private static final String ARCHIVO_TURNOS = "data/turnos.csv";
 
     public static void main(String[] args) {
         final ServicioPaciente servicioPaciente = new ServicioPaciente();

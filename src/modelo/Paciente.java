@@ -1,9 +1,10 @@
 package modelo;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Paciente {
+public class Paciente implements Comparable<Paciente> {
     //Forma de los atributos: Encapsulamiento (siempre se usa en private) + Tipo de dato (En mayuscula) + el nombre del atributo (en minuscula y termina con ;)
     private Long id;
     private String nombre;
@@ -130,6 +131,11 @@ public class Paciente {
     @Override
     public int hashCode() {
         return Objects.hashCode(dni);
+    }
+
+    @Override
+    public int compareTo(Paciente otro) {
+        return this.apellido.compareToIgnoreCase(otro.apellido);
     }
 }
 
